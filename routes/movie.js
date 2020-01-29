@@ -5,6 +5,30 @@ var router = express.Router();
 
 const Movie = require("../models/Movie");
 
+router.get("/:movies_id", (req, res, next) => {
+  // res.send(req.params);
+  var promise = Movie.findById(req.params.movies_id);
+  promise
+    .then(data => {
+      if (!data) next({ message: "The movie was not found." });
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+
+router.get("/", function(req, res) {
+  const promise = Movie.find({});
+  promise
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+
 router.post("/", function(req, res, next) {
   // const { title, imdb_score, category, country, year } = req.body;
 
