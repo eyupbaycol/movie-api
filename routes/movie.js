@@ -2,8 +2,20 @@ var express = require("express");
 var router = express.Router();
 
 //Models
-
 const Movie = require("../models/Movie");
+
+router.get("/top10", function(req, res) {
+  const promise = Movie.find({})
+    .limit(10)
+    .sort({ imdb_score: -1 });
+  promise
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
 
 router.get("/:movies_id", (req, res, next) => {
   // res.send(req.params);
@@ -55,6 +67,33 @@ router.post("/", function(req, res, next) {
     })
     .catch(error => {
       res.json(error);
+    });
+});
+
+router.put("/:movies_id", (req, res, next) => {
+  // res.send(req.params);
+  var promise = Movie.findByIdAndUpdate(req.params.movies_id, req.body, {
+    new: true
+  });
+  promise
+    .then(data => {
+      if (!data) next({ message: "The movie was not found." });
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+router.delete("/:movies_id", (req, res, next) => {
+  // res.send(req.params);
+  var promise = Movie.findByIdAndRemove(req.params.movies_id);
+  promise
+    .then(data => {
+      if (!data) next({ message: "The movie was not found." });
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
     });
 });
 
