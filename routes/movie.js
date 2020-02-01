@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 //Models
+
 const Movie = require("../models/Movie");
 
 router.get("/top10", function(req, res) {
@@ -90,6 +91,23 @@ router.delete("/:movies_id", (req, res, next) => {
   promise
     .then(data => {
       if (!data) next({ message: "The movie was not found." });
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+
+//Betwen
+router.get("/between/:start_year/:end_year", (req, res, next) => {
+  const { start_year, end_year } = req.params;
+  const promise = Movie.find({
+    year: { $gte: parseInt(start_year), $lte: parseInt(end_year) }
+  });
+  promise
+    .then(data => {
+      if (!data) next({ message: "The movie was not found." });
+
       res.json(data);
     })
     .catch(err => {
