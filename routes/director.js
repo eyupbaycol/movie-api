@@ -71,7 +71,35 @@ router.get("/", (req, res, next) => {
       res.json(err);
     });
 });
+// yazarların silindiği endpoint
+router.delete("/:director_id", (req, res, next) => {
+  const promise = Director.findByIdAndRemove(req.params.director_id);
+  promise
+    .then(director => {
+      if (!director)
+        next({ errormesage: "Upps we have a little problem yours code" });
 
+      res.json({ status: "Ok" });
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
+//yazarların update edildiği endpoint
+router.put("/:director_id", (req, res, next) => {
+  const promise = Director.findByIdAndUpdate(req.params.director_id, req.body, {
+    new: true
+  });
+  promise
+    .then(director => {
+      if (!director) next({ errormesage: "Data Not Found" });
+
+      res.json(director);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
 // yazarların detay verilerini çekeceğimiz endpoint
 router.get("/:director_id", (req, res, next) => {
   const promise = Director.aggregate([
@@ -118,7 +146,6 @@ router.get("/:director_id", (req, res, next) => {
       }
     }
   ]);
-
   promise
     .then(data => {
       if (!data) next({ errormesage: "this data not found" });
