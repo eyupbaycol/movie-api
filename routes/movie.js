@@ -31,8 +31,24 @@ router.get("/:movies_id", (req, res, next) => {
     });
 });
 
-router.get("/", function(req, res) {
-  const promise = Movie.find({});
+router.get("/", function(req, res, next) {
+  // const promise = Movie.find({});
+  const promise = Movie.aggregate([
+    {
+      $lookup: {
+        from: "directors",
+        localField: "director_id",
+        foreignField: "_id",
+        as: "directors"
+      }
+    },
+    {
+      $unwind: {
+        path: "$directors",
+        preserveNullAndEmptyArrays: true
+      }
+    }
+  ]);
   promise
     .then(data => {
       res.json(data);
