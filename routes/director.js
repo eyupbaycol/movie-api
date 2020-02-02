@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
@@ -71,6 +72,63 @@ router.get("/", (req, res, next) => {
     });
 });
 
+// yazarların detay verilerini çekeceğimiz endpoint
+router.get("/:director_id", (req, res, next) => {
+  const promise = Director.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(req.params.director_id)
+      }
+    },
+    {
+      $lookup: {
+        from: "movies", // hangi collections ile join işlemi yapacağımız
+        localField: "_id", // hangi alanı eşleyeceğimiz
+        foreignField: "director_id", // hangi alanla eşleyeceğimiz
+        as: "movies" // hangi değişkene kayıt edeceğimiz
+      }
+    },
+    {
+      $unwind: {
+        path: "$movies", // attığımız değişkeni kullanabilmek için
+        preserveNullAndEmptyArrays: true // boş olan kayıtlarında gelmesi için
+      }
+    },
+    {
+      // gruplama işlemini yapıyoruz
+      $group: {
+        _id: {
+          _id: "$_id",
+          name: "$name",
+          surname: "$surname",
+          bio: "$bio"
+        },
+        movies: {
+          $push: "$movies"
+        }
+      }
+    },
+    {
+      $project: {
+        _id: "$_id._id",
+        name: "$_id.name",
+        surname: "$_id.surname",
+        bio: "$_id.bio",
+        movies: "$movies"
+      }
+    }
+  ]);
+
+  promise
+    .then(data => {
+      if (!data) next({ errormesage: "this data not found" });
+
+      res.json(data);
+    })
+    .catch(err => {
+      res.json(err);
+    });
+});
 //list of all directors
 router.get("/", (req, res, next) => {
   var promise = Director.find({});
