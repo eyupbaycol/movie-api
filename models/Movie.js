@@ -5,7 +5,12 @@ const Schema = mongoose.Schema;
 const MovieSchema = new Schema({
   title: {
     type: String,
-    required: true
+    required: [true, '"{PATH}", Alanı Zorunludur'],
+    maxlength: [
+      15,
+      "{PATH} alanı  ({VALUE}), {MAXLENGTH} karakterden küçük olmalıdır"
+    ],
+    minlength: 1
   },
   category: String,
   country: String,
