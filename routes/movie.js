@@ -80,7 +80,7 @@ router.post("/", function(req, res, next) {
   const promise = movie.save();
   promise
     .then(data => {
-      res.json({ status: 1 });
+      res.json(data);
     })
     .catch(error => {
       res.json(error);
